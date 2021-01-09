@@ -1,5 +1,6 @@
-import { App, TFile, MarkdownPostProcessor, MarkdownPostProcessorContext, MarkdownPreviewRenderer, MarkdownRenderer, Modal, Notice, Plugin, PluginSettingTab, Setting } from 'obsidian';
+import { App, TFile, MarkdownPostProcessor, MarkdownPostProcessorContext, MarkdownPreviewRenderer, MarkdownRenderer, Modal, Notice, Plugin, PluginSettingTab, Setting, parseFrontMatterEntry } from 'obsidian';
 import * as jsyaml from './js-yaml';
+import * as grid from './grid.min.js';
 
 export default class Query2Table extends Plugin {
   // half of this plugin is shamelessly ripped from https://github.com/phibr0/obsidian-charts
@@ -49,14 +50,25 @@ export default class Query2Table extends Plugin {
         console.log(files);
         console.log(yaml);
 
-        let html = '';
+        let fmdata: Object[] = [];
 
         for (let file of files) {
-          html += file.basename + '<br><br>';
+          let curr = new Object();
+          let fm = _this.app.metadataCache.getFileCache(file)?.frontmatter;
+
+          for (let field of yaml['fields']) {
+            // desperate times call for desperate measures
+            // @ts-ignore
+            curr[field] = parseFrontMatterEntry(fm, field);
+          }
+
+          fmdata.push(curr);
         }
 
+        console.log(JSON.stringify(fmdata));
+
         const destination = document.createElement('div');
-        destination.innerHTML = html.trim();
+        let html = new grid.Grid({data: fmdata}).render(destination);
 
         el.replaceChild(destination, blockToReplace);
       })
