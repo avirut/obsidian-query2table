@@ -27,7 +27,10 @@ If you have any good ideas for field types, feel free to open up an issue and I'
 Because of limitations within the Obsidian API, the only way to make the querying part of this plugin work is to run the query through the UI, then pull out the returned files. This means that whenever the `query2table` codeblock is rendered, you'll see the search being run in your UI as well. However, there is some delay between the search being run and the files being output. If this delay is too short, you may not get all your files into the table. Adjust `approxNumberOfResults` as necessary to ensure that you get all your files without waiting too long.
 
 ## Sample Output
-![sample output](https://github.com/avirut/obsidian-metatemplates/blob/master/imgs/from-template.png?raw=true)
+### Full Results
+![full results](https://github.com/avirut/obsidian-query2table/blob/master/imgs/full-results.png?raw=true)
+### Search and Sort
+![search and sort](https://github.com/avirut/obsidian-query2table/blob/master/imgs/search-sort-results.png?raw=true)
 
 ## Credits
 Much of the code/structure in this plugin came from [obsidian-charts](https://github.com/phibr0/obsidian-charts) and [obsidian-text-expand](https://github.com/mrjackphil/obsidian-text-expand). Also, big thanks to Liam and Licat in the Discord #plugins channel for their help finding ways to solve problems.
