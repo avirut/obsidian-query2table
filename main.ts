@@ -110,15 +110,19 @@ export default class Query2Table extends Plugin {
           curr['formatter'] = formatter;
           columnData.push(formatter ? curr : field);
         }
-        console.log('columnData:')
-        console.log(columnData);
 
+      fileloop:
         for (let file of files) {
           let curr: any = new Object();
           let fm = _this.app.metadataCache.getFileCache(file)?.frontmatter;
-
           for (let field of fields) {
             curr[field] = parseFrontMatterEntry(fm, field);
+
+            // if the main field is null or undefined, just don't add it
+            if (!curr[field] && fieldData[field] == 'note') {
+              console.log("here")
+              continue fileloop;
+            }
           }
 
           fmdata.push(curr);
