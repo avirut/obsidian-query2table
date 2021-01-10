@@ -64,6 +64,8 @@ export default class Query2Table extends Plugin {
           let formatter;
           switch (fieldData[field]) {
 
+            // this one is pretty shady, I take the title and use it to find the corresponding note
+            // then, I have to manually build a URL to that note as the built-in methods didn't work well for me
             case 'note': {
               formatter = (cell: any) => {
                 for (let notefile of files) {
