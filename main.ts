@@ -84,7 +84,7 @@ export default class Query2Table extends Plugin {
               break;
             }
 
-            case 'textAsLink': {
+            case 'text-as-link': {
               formatter = (cell: any) => grid.html(`<a href="${cell}">${cell}</a>`);
               break;
             }
