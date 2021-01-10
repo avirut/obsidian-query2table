@@ -33,4 +33,4 @@ Because of limitations within the Obsidian API, the only way to make the queryin
 ![search and sort](https://github.com/avirut/obsidian-query2table/blob/master/imgs/search-sort-results.png?raw=true)
 
 ## Credits
-Much of the code/structure in this plugin came from [obsidian-charts](https://github.com/phibr0/obsidian-charts) and [obsidian-text-expand](https://github.com/mrjackphil/obsidian-text-expand). Also, big thanks to Liam and Licat in the Discord #plugins channel for their help finding ways to solve problems.
+Much of the code/structure in this plugin came from [obsidian-charts](https://github.com/phibr0/obsidian-charts) and [obsidian-text-expand](https://github.com/mrjackphil/obsidian-text-expand). Also, thanks to Liam and Licat in the Discord #plugins channel for their frequent help!
