@@ -4,7 +4,7 @@ Represent files returned by a query as a table of their YAML frontmatter
 ## Disclaimer
 I haven't really tested this plugin at all on any vaults but my own, and there are likely many places where the appropriate checks for `null` or `undefined` values are missing. Therefore, you may experience significant errors early on. When this happens, please open DevTools (`ctrl/cmd + shift + i`), save the console error output, and report it as an issue through this repository's `Issues` tab. This plugin *shouldn't* delete your files or anything, but it may just occassionally not work as expected. 
 
-## Frontmatter-based templates
+## Table generation from query
 This plugin allows you to output the results of a query as a searchable, sortable table of the frontmatter attributes from relevant notes.
 ![sample codeblock](https://github.com/avirut/obsidian-query2table/blob/master/imgs/codeblock.png?raw=true)
 
