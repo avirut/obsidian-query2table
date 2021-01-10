@@ -1,4 +1,4 @@
-import { App, TFile, MarkdownPostProcessor, MarkdownPostProcessorContext, MarkdownPreviewRenderer, MarkdownRenderer, Modal, Notice, Plugin, PluginSettingTab, MetadataCache, Setting, parseFrontMatterEntry } from 'obsidian';
+import { TFile, MarkdownPostProcessor, MarkdownPostProcessorContext, MarkdownPreviewRenderer, Plugin, parseFrontMatterEntry } from 'obsidian';
 import * as jsyaml from './js-yaml';
 import * as grid from './grid.min.js';
 
@@ -43,17 +43,19 @@ export default class Query2Table extends Plugin {
 		let yaml = jsyaml.load(plotBlock.textContent)
 		if (!yaml || !yaml['query']) { return; }
 
-    // console.log("running the query...");
+    // getFiles as a promise, and on completion perform the bulk of the plugin's work
     _this.app.plugins.plugins['obsidian-query2table']
       .getFiles(yaml['query'], parseInt(yaml['approxNumberOfResults']))
       .then((files: TFile[]) => {
         // console.log(files);
         // console.log(yaml);
 
+        // get initial data, flatten field data
         let fmdata: Object[] = [];
         let fieldData = Object.assign.apply(Object, yaml['fields']);
         let fields = Object.keys(fieldData);
 
+        // build the formatter for each specified field to later pass to grid.js as 'columns'
         let columnData = [];
         for (let field of fields) {
           let curr: any = new Object();
@@ -111,6 +113,7 @@ export default class Query2Table extends Plugin {
           columnData.push(formatter ? curr : field);
         }
 
+        // build JSON data (or rather javascript objects) from the pulled files
       fileloop:
         for (let file of files) {
           let curr: any = new Object();
@@ -128,7 +131,7 @@ export default class Query2Table extends Plugin {
           fmdata.push(curr);
         }
 
-        // console.log(JSON.stringify(fmdata));
+        // render the data with column formatting to destination
         const destination = document.createElement('div');
         new grid.Grid({
           sort: true,
@@ -137,6 +140,7 @@ export default class Query2Table extends Plugin {
           data: fmdata
         }).render(destination);
 
+        // replace the initial codeblock with the destination
         el.replaceChild(destination, blockToReplace);
       })
 	}
