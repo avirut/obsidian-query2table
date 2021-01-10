@@ -1,2 +1,33 @@
 # obsidian-query2table
 Represent files returned by a query as a table of their YAML frontmatter
+
+## Disclaimer
+I haven't really tested this plugin at all on any vaults but my own, and there are likely many places where the appropriate checks for `null` or `undefined` values are missing. Therefore, you may experience significant errors early on. When this happens, please open DevTools (`ctrl/cmd + shift + i`), save the console error output, and report it as an issue through this repository's `Issues` tab. This plugin *shouldn't* delete your files or anything, but it may just occassionally not work as expected. 
+
+## Frontmatter-based templates
+This plugin allows you to output the results of a query as a searchable, sortable table of the frontmatter attributes from relevant notes.
+![sample codeblock](https://github.com/avirut/obsidian-query2table/blob/master/imgs/codeblock.png?raw=true)
+
+## Usage
+Within your `query2table` codeblock, specify the attributes `query`, `fields`, and `approxNumberOfResults`.
+
+### Query
+A string (enclosed in `""` or `''`) which indicates what you're searching for. This is the same format as if you were using the built in file-search (because the plugin actually does use the built in file search).
+
+### Fields
+A list of the YAML frontmatter attributes, and their corresponding "type". Available types are:
+- `note` - The text will be the same as the frontmatter attribute, but this column will link to the actual note the row refers to.
+- `link` - Long links are handled poorly by the table (they take up a lot of width), so use this attribute to replace them with the word `Link` that has a hyperlink to whatever link was specified in the frontmatter attribute.
+- `text-as-link` - This one uses the original text of the frontmatter attribute, but makes it a link as well. It's similar to `link`, but possibly better if seeing the actual link before you click it is really important to you.
+- `list` - Use this for frontmatter attributes that are text arrays - the value in the table will show as a bullet pointed list.
+
+If you have any good ideas for field types, feel free to open up an issue and I'll work on it when I get the chance. 
+
+###  Approximate Number of Results
+Because of limitations within the Obsidian API, the only way to make the querying part of this plugin work is to run the query through the UI, then pull out the returned files. This means that whenever the `query2table` codeblock is rendered, you'll see the search being run in your UI as well. However, there is some delay between the search being run and the files being output. If this delay is too short, you may not get all your files into the table. Adjust `approxNumberOfResults` as necessary to ensure that you get all your files without waiting too long.
+
+## Sample Output
+![sample output](https://github.com/avirut/obsidian-metatemplates/blob/master/imgs/from-template.png?raw=true)
+
+## Credits
+Much of the code/structure in this plugin came from [obsidian-charts](https://github.com/phibr0/obsidian-charts) and [obsidian-text-expand](https://github.com/mrjackphil/obsidian-text-expand). Also, big thanks to Liam and Licat in the Discord #plugins channel for their help finding ways to solve problems.
