@@ -1,7 +1,7 @@
 {
   "compilerOptions": {
     "baseUrl": ".",
-    "outDir": "C:/Users/avirut/OneDrive/Notes/.obsidian/plugins/obsidian-query2table",
+    "outDir": "C:/Users/avirut/Documents/GitHub/obsidian-pluginpilot/.obsidian/plugins/obsidian-query2table",
     "inlineSourceMap": true,
     "inlineSources": true,
     "module": "ESNext",
