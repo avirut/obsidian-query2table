@@ -1,6 +1,6 @@
 {
-  "name": "obsidian-metamatter",
-  "version": "0.10.6",
+  "name": "obsidian-query2table",
+  "version": "0.1.0",
   "description": "add functionality to YAML metadata in obsidian.md",
   "main": "main.js",
   "scripts": {
@@ -8,17 +8,15 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/avirut/obsidian-metamatter.git"
+    "url": "git+https://github.com/avirut/obsidian-query2table.git"
   },
   "author": "avirut",
   "license": "ISC",
   "bugs": {
-    "url": "https://github.com/avirut/obsidian-metamatter/issues"
+    "url": "https://github.com/avirut/obsidian-query2table/issues"
   },
-  "homepage": "https://github.com/avirut/obsidian-metamatter#readme",
-  "dependencies": {
-    "gray-matter": "^4.0.2"
-  },
+  "homepage": "https://github.com/avirut/obsidian-query2table#readme",
+  "dependencies": {},
   "devDependencies": {
     "@rollup/plugin-commonjs": "^17.0.0",
     "@rollup/plugin-node-resolve": "^11.0.1",
