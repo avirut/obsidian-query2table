@@ -59,7 +59,8 @@ export default class Query2Table extends Plugin {
         let columnData = [];
         for (let field of fields) {
           let curr: any = new Object();
-          curr['name'] = field;
+          curr['id'] = field;
+          curr['name'] = grid.html(`${field}<br>`);
 
           let formatter;
           switch (fieldData[field]) {
@@ -111,8 +112,10 @@ export default class Query2Table extends Plugin {
             }
           }
 
-          curr['formatter'] = formatter;
-          columnData.push(formatter ? curr : field);
+          if (formatter) {
+            curr['formatter'] = formatter;
+          }
+          columnData.push(curr);
         }
 
         // build JSON data (or rather javascript objects) from the pulled files
