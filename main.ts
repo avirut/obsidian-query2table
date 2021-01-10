@@ -125,7 +125,6 @@ export default class Query2Table extends Plugin {
 
             // if the main field is null or undefined, just don't add it
             if (!curr[field] && fieldData[field] == 'note') {
-              console.log("here")
               continue fileloop;
             }
           }
