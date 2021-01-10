@@ -1,4 +1,4 @@
-import { App, TFile, MarkdownPostProcessor, MarkdownPostProcessorContext, MarkdownPreviewRenderer, MarkdownRenderer, Modal, Notice, Plugin, PluginSettingTab, Setting, parseFrontMatterEntry } from 'obsidian';
+import { App, TFile, MarkdownPostProcessor, MarkdownPostProcessorContext, MarkdownPreviewRenderer, MarkdownRenderer, Modal, Notice, Plugin, PluginSettingTab, MetadataCache, Setting, parseFrontMatterEntry } from 'obsidian';
 import * as jsyaml from './js-yaml';
 import * as grid from './grid.min.js';
 
@@ -43,55 +43,98 @@ export default class Query2Table extends Plugin {
 		let yaml = jsyaml.load(plotBlock.textContent)
 		if (!yaml || !yaml['query']) { return; }
 
-    console.log("running the query...");
+    // console.log("running the query...");
     _this.app.plugins.plugins['obsidian-query2table']
       .getFiles(yaml['query'], parseInt(yaml['approxNumberOfResults']))
       .then((files: TFile[]) => {
-        console.log(files);
-        console.log(yaml);
+        // console.log(files);
+        // console.log(yaml);
 
         let fmdata: Object[] = [];
+        let fieldData = Object.assign.apply(Object, yaml['fields']);
+        let fields = Object.keys(fieldData);
+
+        let columnData = [];
+        for (let field of fields) {
+          let curr: any = new Object();
+          curr['name'] = field;
+
+          let formatter;
+          switch (fieldData[field]) {
+
+            case 'note': {
+              formatter = (cell: any) => {
+                for (let notefile of files) {
+                  let fm = _this.app.metadataCache.getFileCache(notefile)?.frontmatter;
+                  if (fm[field] && fm[field].indexOf(cell) >= 0) {
+                    let basePath = (<any>notefile.vault.adapter).getBasePath();
+                    basePath = basePath.substring(basePath.lastIndexOf('\\')+1);
+                    let notePath = (<any>encodeURI(notefile.path)).replaceAll("&", "%26");
+                    let myLink = 'obsidian://open?vault=' + basePath + '&file=' + notePath;
+                    // console.log(myLink);
+                    return grid.html(`<a href="${myLink}">${cell}</a>`);
+                  }
+                }
+                return grid.html(`${cell}`);
+              }
+              break;
+            }
+
+            case 'textAsLink': {
+              formatter = (cell: any) => grid.html(`<a href="${cell}">${cell}</a>`);
+              break;
+            }
+
+            case 'link': {
+              formatter = (cell: any) => grid.html(`<a href="${cell}">Link</a>`);
+              break;
+            }
+
+            case 'list': {
+              formatter = (cell: any) => {
+                let listhtml = `<ul>`;
+                for (let item of cell) {
+                  listhtml += `<li>${item}</li>`;
+                }
+                listhtml += `</ul>`;
+                return grid.html(listhtml);
+              }
+              break;
+            }
+
+            default: {
+              formatter = undefined;
+            }
+          }
+
+          curr['formatter'] = formatter;
+          columnData.push(formatter ? curr : field);
+        }
+        console.log('columnData:')
+        console.log(columnData);
 
         for (let file of files) {
-          let curr = new Object();
+          let curr: any = new Object();
           let fm = _this.app.metadataCache.getFileCache(file)?.frontmatter;
 
-          for (let field of yaml['fields']) {
-            // desperate times call for desperate measures
-            // @ts-ignore
+          for (let field of fields) {
             curr[field] = parseFrontMatterEntry(fm, field);
           }
 
           fmdata.push(curr);
         }
 
-        console.log(JSON.stringify(fmdata));
-
+        // console.log(JSON.stringify(fmdata));
         const destination = document.createElement('div');
-        let html = new grid.Grid({data: fmdata}).render(destination);
+        new grid.Grid({
+          sort: true,
+          search: true,
+          columns: columnData,
+          data: fmdata
+        }).render(destination);
 
         el.replaceChild(destination, blockToReplace);
       })
-
-		//create the new element
-
-		// if (yaml['type'] === 'line') new Chartist.Line(destination, {
-		// 	labels: yaml.labels,
-		// 	series: yaml.series
-		// }, {
-		// 	lineSmooth: Chartist.Interpolation.cardinal({
-		// 		fillHoles: yaml.fillGaps ?? false,
-		// 	  }),
-		// 	  low: yaml.low ?? null,
-		// 	  showArea: yaml.showArea ?? false
-		// });
-		// else if (yaml.type === 'bar') new Chartist.Bar(destination, {
-		// 	labels: yaml.labels,
-		// 	series: yaml.series
-		// }, {
-		// 	  low: yaml.low ?? null,
-		// });
-		// else return
 	}
 
 	onload() {
