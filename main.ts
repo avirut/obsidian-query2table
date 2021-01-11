@@ -71,7 +71,7 @@ export default class Query2Table extends Plugin {
                 formatter = (cell: any) => {
                   for (let notefile of files) {
                     let fm = this.app.metadataCache.getFileCache(notefile)?.frontmatter;
-                    if (fm[field] && fm[field].indexOf(cell) >= 0) {
+                    if (fm && fm[field] && fm[field].indexOf(cell) >= 0) {
                       let basePath = (<any>notefile.vault.adapter).getBasePath();
                       basePath = basePath.substring(basePath.lastIndexOf('\\') + 1);
                       let notePath = (<any>encodeURI(notefile.path)).replaceAll("&", "%26");
