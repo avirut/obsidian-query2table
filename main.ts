@@ -13,11 +13,19 @@ export default class Query2Table extends Plugin {
   }
 
   async getFoundAfterDelay(delay: number) {
-    const searchLeaf = this.app.workspace.getLeavesOfType('search')[0]
-    const view = await searchLeaf.open(searchLeaf.view)
+    const searchLeaf = this.app.workspace.getLeavesOfType('search')[0];
+    const view = await searchLeaf.open(searchLeaf.view);
     return new Promise(resolve => {
       // @ts-ignore
-      setTimeout(() => resolve(Array.from(view.dom.resultDomLookup.keys())), delay)
+      setTimeout(() => {
+        console.log("logging view: ");
+        console.log(view);
+        console.log("logging keys: ");
+        // @ts-ignore
+        console.log(Array.from(view.dom.resultDomLookup.keys()));
+        // @ts-ignore
+        return resolve(Array.from(view.dom.resultDomLookup.keys()));
+      }, delay);
     })
   }
 
@@ -25,6 +33,8 @@ export default class Query2Table extends Plugin {
     this.search(query);
     let searchTime = approxNumberOfResults * 10 + 500;
     let files = await this.getFoundAfterDelay(searchTime) as TFile[];
+    console.log("files being returned after query:")
+    console.log(files);
     return files;
   }
 
