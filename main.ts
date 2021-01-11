@@ -13,35 +13,35 @@ export default class Query2Table extends Plugin {
   }
 
   async getFoundAfterDelay(delay: number) {
-     const searchLeaf = this.app.workspace.getLeavesOfType('search')[0]
-     const view = await searchLeaf.open(searchLeaf.view)
-     return new Promise(resolve => {
-         // @ts-ignore
-         setTimeout(() => resolve(Array.from(view.dom.resultDomLookup.keys())), delay)
-     })
- }
+    const searchLeaf = this.app.workspace.getLeavesOfType('search')[0]
+    const view = await searchLeaf.open(searchLeaf.view)
+    return new Promise(resolve => {
+      // @ts-ignore
+      setTimeout(() => resolve(Array.from(view.dom.resultDomLookup.keys())), delay)
+    })
+  }
 
   async getFiles(query: string, approxNumberOfResults: number): Promise<TFile[]> {
     this.search(query);
-    let searchTime = approxNumberOfResults*10 + 500;
+    let searchTime = approxNumberOfResults * 10 + 500;
     let files = await this.getFoundAfterDelay(searchTime) as TFile[];
     return files;
   }
 
-	static postprocessor: MarkdownPostProcessor = (el: HTMLElement, ctx: MarkdownPostProcessorContext) => {
+  static postprocessor: MarkdownPostProcessor = (el: HTMLElement, ctx: MarkdownPostProcessorContext) => {
     const _this = ctx.el.ownerDocument.defaultView;
 
     // select for codeblocks
-		let blockToReplace = el.querySelector('pre');
-		if (!blockToReplace) { return; }
+    let blockToReplace = el.querySelector('pre');
+    if (!blockToReplace) { return; }
 
-		// out of those, select for query2table codeblocks
-		let plotBlock = blockToReplace.querySelector('code.language-query2table');
-		if (!plotBlock) { return; }
+    // out of those, select for query2table codeblocks
+    let plotBlock = blockToReplace.querySelector('code.language-query2table');
+    if (!plotBlock) { return; }
 
-		// parse YAML
-		let yaml = jsyaml.load(plotBlock.textContent)
-		if (!yaml || !yaml['query']) { return; }
+    // parse YAML
+    let yaml = jsyaml.load(plotBlock.textContent)
+    if (!yaml || !yaml['query']) { return; }
 
     // getFiles as a promise, and on completion perform the bulk of the plugin's work
     _this.app.plugins.plugins['obsidian-query2table']
@@ -73,7 +73,7 @@ export default class Query2Table extends Plugin {
                   let fm = _this.app.metadataCache.getFileCache(notefile)?.frontmatter;
                   if (fm[field] && fm[field].indexOf(cell) >= 0) {
                     let basePath = (<any>notefile.vault.adapter).getBasePath();
-                    basePath = basePath.substring(basePath.lastIndexOf('\\')+1);
+                    basePath = basePath.substring(basePath.lastIndexOf('\\') + 1);
                     let notePath = (<any>encodeURI(notefile.path)).replaceAll("&", "%26");
                     let myLink = 'obsidian://open?vault=' + basePath + '&file=' + notePath;
                     // console.log(myLink);
@@ -119,7 +119,7 @@ export default class Query2Table extends Plugin {
         }
 
         // build JSON data (or rather javascript objects) from the pulled files
-      fileloop:
+        fileloop:
         for (let file of files) {
           let curr: any = new Object();
           let fm = _this.app.metadataCache.getFileCache(file)?.frontmatter;
@@ -147,16 +147,16 @@ export default class Query2Table extends Plugin {
         // replace the initial codeblock with the destination
         el.replaceChild(destination, blockToReplace);
       })
-	}
+  }
 
-	onload() {
-		console.log('loading plugin: query2table');
-		MarkdownPreviewRenderer.registerPostProcessor(Query2Table.postprocessor);
-	}
+  onload() {
+    console.log('loading plugin: query2table');
+    MarkdownPreviewRenderer.registerPostProcessor(Query2Table.postprocessor);
+  }
 
-	onunload() {
-		console.log('unloading plugin: query2table');
-		MarkdownPreviewRenderer.unregisterPostProcessor(Query2Table.postprocessor);
-	}
+  onunload() {
+    console.log('unloading plugin: query2table');
+    MarkdownPreviewRenderer.unregisterPostProcessor(Query2Table.postprocessor);
+  }
 
 }
