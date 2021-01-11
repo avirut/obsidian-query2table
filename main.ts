@@ -1,4 +1,4 @@
-import { TFile, MarkdownPostProcessor, MarkdownPostProcessorContext, MarkdownPreviewRenderer, Plugin, parseFrontMatterEntry } from 'obsidian';
+import { TFile, Plugin, parseFrontMatterEntry } from 'obsidian';
 import * as jsyaml from './js-yaml';
 import * as grid from './grid.min.js';
 
@@ -30,7 +30,7 @@ export default class Query2Table extends Plugin {
 
   onload() {
     console.log('loading plugin: query2table');
-    this.registerMarkdownPostProcessor((el: HTMLElement, ctx: MarkdownPostProcessorContext) => {
+    this.registerMarkdownPostProcessor((el: HTMLElement) => {
 
       // select for codeblocks
       let blockToReplace = el.querySelector('pre');
