@@ -28,135 +28,130 @@ export default class Query2Table extends Plugin {
     return files;
   }
 
-  static postprocessor: MarkdownPostProcessor = (el: HTMLElement, ctx: MarkdownPostProcessorContext) => {
-    const _this = ctx.el.ownerDocument.defaultView;
-
-    // select for codeblocks
-    let blockToReplace = el.querySelector('pre');
-    if (!blockToReplace) { return; }
-
-    // out of those, select for query2table codeblocks
-    let plotBlock = blockToReplace.querySelector('code.language-query2table');
-    if (!plotBlock) { return; }
-
-    // parse YAML
-    let yaml = jsyaml.load(plotBlock.textContent)
-    if (!yaml || !yaml['query']) { return; }
-
-    // getFiles as a promise, and on completion perform the bulk of the plugin's work
-    _this.app.plugins.plugins['obsidian-query2table']
-      .getFiles(yaml['query'], parseInt(yaml['approxNumberOfResults']))
-      .then((files: TFile[]) => {
-        // console.log(files);
-        // console.log(yaml);
-
-        // get initial data, flatten field data
-        let fmdata: Object[] = [];
-        let fieldData = Object.assign.apply(Object, yaml['fields']);
-        let fields = Object.keys(fieldData);
-
-        // build the formatter for each specified field to later pass to grid.js as 'columns'
-        let columnData = [];
-        for (let field of fields) {
-          let curr: any = new Object();
-          curr['id'] = field;
-          curr['name'] = grid.html(`${field}<br>`);
-
-          let formatter;
-          switch (fieldData[field]) {
-
-            // this one is pretty shady, I take the title and use it to find the corresponding note
-            // then, I have to manually build a URL to that note as the built-in methods didn't work well for me
-            case 'note': {
-              formatter = (cell: any) => {
-                for (let notefile of files) {
-                  let fm = _this.app.metadataCache.getFileCache(notefile)?.frontmatter;
-                  if (fm[field] && fm[field].indexOf(cell) >= 0) {
-                    let basePath = (<any>notefile.vault.adapter).getBasePath();
-                    basePath = basePath.substring(basePath.lastIndexOf('\\') + 1);
-                    let notePath = (<any>encodeURI(notefile.path)).replaceAll("&", "%26");
-                    let myLink = 'obsidian://open?vault=' + basePath + '&file=' + notePath;
-                    // console.log(myLink);
-                    return grid.html(`<a href="${myLink}">${cell}</a>`);
-                  }
-                }
-                return grid.html(`${cell}`);
-              }
-              break;
-            }
-
-            case 'text-as-link': {
-              formatter = (cell: any) => grid.html(`<a href="${cell}">${cell}</a>`);
-              break;
-            }
-
-            case 'link': {
-              formatter = (cell: any) => grid.html(`<a href="${cell}">Link</a>`);
-              break;
-            }
-
-            case 'list': {
-              formatter = (cell: any) => {
-                let listhtml = `<ul>`;
-                for (let item of cell) {
-                  listhtml += `<li>${item}</li>`;
-                }
-                listhtml += `</ul>`;
-                return grid.html(listhtml);
-              }
-              break;
-            }
-
-            default: {
-              formatter = undefined;
-            }
-          }
-
-          if (formatter) {
-            curr['formatter'] = formatter;
-          }
-          columnData.push(curr);
-        }
-
-        // build JSON data (or rather javascript objects) from the pulled files
-        fileloop:
-        for (let file of files) {
-          let curr: any = new Object();
-          let fm = _this.app.metadataCache.getFileCache(file)?.frontmatter;
-          for (let field of fields) {
-            curr[field] = parseFrontMatterEntry(fm, field);
-
-            // if the main field is null or undefined, just don't add it
-            if (!curr[field] && fieldData[field] == 'note') {
-              continue fileloop;
-            }
-          }
-
-          fmdata.push(curr);
-        }
-
-        // render the data with column formatting to destination
-        const destination = document.createElement('div');
-        new grid.Grid({
-          sort: true,
-          search: true,
-          columns: columnData,
-          data: fmdata
-        }).render(destination);
-
-        // replace the initial codeblock with the destination
-        el.replaceChild(destination, blockToReplace);
-      })
-  }
-
   onload() {
     console.log('loading plugin: query2table');
-    MarkdownPreviewRenderer.registerPostProcessor(Query2Table.postprocessor);
+    this.registerMarkdownPostProcessor((el: HTMLElement, ctx: MarkdownPostProcessorContext) => {
+
+      // select for codeblocks
+      let blockToReplace = el.querySelector('pre');
+      if (!blockToReplace) { return; }
+
+      // out of those, select for query2table codeblocks
+      let plotBlock = blockToReplace.querySelector('code.language-query2table');
+      if (!plotBlock) { return; }
+
+      // parse YAML
+      let yaml = jsyaml.load(plotBlock.textContent)
+      if (!yaml || !yaml['query']) { return; }
+
+      // getFiles as a promise, and on completion perform the bulk of the plugin's work
+      this.getFiles(yaml['query'], parseInt(yaml['approxNumberOfResults']))
+        .then((files: TFile[]) => {
+          // console.log(files);
+          // console.log(yaml);
+
+          // get initial data, flatten field data
+          let fmdata: Object[] = [];
+          let fieldData = Object.assign.apply(Object, yaml['fields']);
+          let fields = Object.keys(fieldData);
+
+          // build the formatter for each specified field to later pass to grid.js as 'columns'
+          let columnData = [];
+          for (let field of fields) {
+            let curr: any = new Object();
+            curr['id'] = field;
+            curr['name'] = grid.html(`${field}<br>`);
+
+            let formatter;
+            switch (fieldData[field]) {
+
+              // this one is pretty shady, I take the title and use it to find the corresponding note
+              // then, I have to manually build a URL to that note as the built-in methods didn't work well for me
+              case 'note': {
+                formatter = (cell: any) => {
+                  for (let notefile of files) {
+                    let fm = this.app.metadataCache.getFileCache(notefile)?.frontmatter;
+                    if (fm[field] && fm[field].indexOf(cell) >= 0) {
+                      let basePath = (<any>notefile.vault.adapter).getBasePath();
+                      basePath = basePath.substring(basePath.lastIndexOf('\\') + 1);
+                      let notePath = (<any>encodeURI(notefile.path)).replaceAll("&", "%26");
+                      let myLink = 'obsidian://open?vault=' + basePath + '&file=' + notePath;
+                      // console.log(myLink);
+                      return grid.html(`<a href="${myLink}">${cell}</a>`);
+                    }
+                  }
+                  return grid.html(`${cell}`);
+                }
+                break;
+              }
+
+              case 'text-as-link': {
+                formatter = (cell: any) => grid.html(`<a href="${cell}">${cell}</a>`);
+                break;
+              }
+
+              case 'link': {
+                formatter = (cell: any) => grid.html(`<a href="${cell}">Link</a>`);
+                break;
+              }
+
+              case 'list': {
+                formatter = (cell: any) => {
+                  let listhtml = `<ul>`;
+                  for (let item of cell) {
+                    listhtml += `<li>${item}</li>`;
+                  }
+                  listhtml += `</ul>`;
+                  return grid.html(listhtml);
+                }
+                break;
+              }
+
+              default: {
+                formatter = undefined;
+              }
+            }
+
+            if (formatter) {
+              curr['formatter'] = formatter;
+            }
+            columnData.push(curr);
+          }
+
+          // build JSON data (or rather javascript objects) from the pulled files
+          fileloop:
+          for (let file of files) {
+            let curr: any = new Object();
+            let fm = this.app.metadataCache.getFileCache(file)?.frontmatter;
+            for (let field of fields) {
+              curr[field] = parseFrontMatterEntry(fm, field);
+
+              // if the main field is null or undefined, just don't add it
+              if (!curr[field] && fieldData[field] == 'note') {
+                continue fileloop;
+              }
+            }
+
+            fmdata.push(curr);
+          }
+
+          // render the data with column formatting to destination
+          const destination = document.createElement('div');
+          new grid.Grid({
+            sort: true,
+            search: true,
+            columns: columnData,
+            data: fmdata
+          }).render(destination);
+
+          // replace the initial codeblock with the destination
+          el.replaceChild(destination, blockToReplace);
+        })
+    })
   }
 
   onunload() {
     console.log('unloading plugin: query2table');
-    MarkdownPreviewRenderer.unregisterPostProcessor(Query2Table.postprocessor);
   }
 
 }
