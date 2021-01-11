@@ -18,7 +18,7 @@ A string (enclosed in `""` or `''`) which indicates what you're searching for. T
 
 ### Fields
 A list of the YAML frontmatter attributes, and their corresponding "type". Available types are:
-- `note` - The text will be the same as the frontmatter attribute, but this column will link to the actual note the row refers to.
+- `note` - The text will be the same as the frontmatter attribute, but this column will link to the actual note the row refers to. The frontmatter value for whatever attribute this refers to *must* be present (not `null` or `undefined`), or the row for that file will not be shown.
 - `link` - Long links are handled poorly by the table (they take up a lot of width), so use this attribute to replace them with the word `Link` that has a hyperlink to whatever link was specified in the frontmatter attribute.
 - `text-as-link` - This one uses the original text of the frontmatter attribute, but makes it a link as well. It's similar to `link`, but possibly better if seeing the actual link before you click it is really important to you.
 - `list` - Use this for frontmatter attributes that are text arrays - the value in the table will show as a bullet pointed list.
