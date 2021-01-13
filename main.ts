@@ -7,6 +7,7 @@ export default class Query2Table extends Plugin {
   // the other (even harder) half was from https://github.com/mrjackphil/obsidian-text-expand
 
   search(s: string) {
+    // @ts-ignore
     const globalSearchFn = this.app.internalPlugins.getPluginById('global-search').instance.openGlobalSearch.bind(this);
     const searchFor = (query: string) => globalSearchFn(query);
     searchFor(s);
