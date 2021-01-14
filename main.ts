@@ -7,6 +7,7 @@ export default class Query2Table extends Plugin {
   // the other (even harder) half was from https://github.com/mrjackphil/obsidian-text-expand
 
   search(s: string) {
+    // @ts-ignore
     const globalSearchFn = this.app.internalPlugins.getPluginById('global-search').instance.openGlobalSearch.bind(this);
     const searchFor = (query: string) => globalSearchFn(query);
     searchFor(s);
@@ -75,17 +76,12 @@ export default class Query2Table extends Plugin {
             let formatter;
             switch (fieldData[field]) {
 
-              // this one is pretty shady, I take the title and use it to find the corresponding note
-              // then, I have to manually build a URL to that note as the built-in methods didn't work well for me
               case 'note': {
                 formatter = (cell: any) => {
                   for (let notefile of files) {
                     let fm = this.app.metadataCache.getFileCache(notefile)?.frontmatter;
                     if (fm && fm[field] && fm[field].indexOf(cell) >= 0) {
-                      let basePath = (<any>notefile.vault.adapter).getBasePath();
-                      basePath = basePath.substring(basePath.lastIndexOf('\\') + 1);
-                      let notePath = (<any>encodeURI(notefile.path)).replaceAll("&", "%26");
-                      let myLink = 'obsidian://open?vault=' + basePath + '&file=' + notePath;
+                      let myLink = 'obsidian://open?vault=' + notefile.vault.getName() + '&file=' + notefile.path;
                       // console.log(myLink);
                       return grid.html(`<a href="${myLink}">${cell}</a>`);
                     }
