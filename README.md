@@ -1,3 +1,6 @@
+# ARCHIVED
+This plugin was a temporary solution to a problem that has now been better solved by [Obsidian Dataview](https://github.com/blacksmithgu/obsidian-dataview). In the future, I may fork Obsidian Dataview to match the rendering featureset that I want while keeping its far superior query handlers. This plugin, however, will receive no further updates.
+
 # obsidian-query2table
 Represent files returned by a query as a table of their YAML frontmatter
 
